@@ -1,3 +1,4 @@
+# Author: Mayuri Gujja
 # Functional test on a greenkart ( e-commerce application) that performs the following tasks
 # 1. Searches for a keyword
 # 2. Adds veggies to the cart
@@ -19,18 +20,25 @@ driver.implicitly_wait(5)
 driver.get("https://rahulshettyacademy.com/seleniumPractise/#/")
 # Search with "ber" keyword
 driver.find_element_by_css_selector("input.search-keyword").send_keys("ber")
+ExpectedVeggies = ['Cucumber - 1 Kg', 'Raspberry - 1/4 Kg', 'Strawberry - 1/4 Kg']
+
 time.sleep(4)
 # Count the number of fruits/veggies returned
 countNUM = len(driver.find_elements_by_css_selector("div.products"))
 # Initialize two lists to validate the veggies name before and after checkout
 VeggiesFirstPage = []
 VeggiesLastPage = []
+
 # Click on add to cart button of all the veggies in the search results
 addToCartButtons = driver.find_elements_by_xpath("//div[@class='product-action']/button")
+# Get the text of all the veggies and store it in the list
 for btn in addToCartButtons:
     vegname = btn.find_element_by_xpath("parent::div/parent::div/h4").text
+    # Append each veggie name to the list
     VeggiesFirstPage.append(vegname)
     btn.click()
+assert ExpectedVeggies == VeggiesFirstPage
+# Click the add to cart button
 driver.find_element_by_css_selector("a.cart-icon").click()
 driver.find_element_by_xpath("//button[text()='PROCEED TO CHECKOUT']").click()
 wait = WebDriverWait(driver, 10)
@@ -51,5 +59,15 @@ CodeText = driver.find_element_by_class_name("promoInfo").text
 assert "Code applied" in CodeText
 discountAfterPromo = driver.find_element_by_class_name("discountAmt").text
 assert float(discountAfterPromo) < int(discountBeforePromo)
+
+# Count the total amount of the vegetables
+sum = 0
+Amounts = driver.find_elements_by_xpath("//tr/td[5]/p")
+for Amount in Amounts:
+    sum = sum + int(Amount.text)
+print(sum)
+TotalAmount = driver.find_element_by_class_name("totAmt").text
+assert sum == int(TotalAmount)
+
 
 
